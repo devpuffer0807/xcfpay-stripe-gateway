@@ -95,7 +95,7 @@ router.post("/stripe_hook", async function (req, res, next) {
   try {
     // Check if the event is sent from Stripe or a third party
     // And parse the event
-    event = await Stripe.webhooks.varructEvent(
+    event = await Stripe.webhooks.constructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
