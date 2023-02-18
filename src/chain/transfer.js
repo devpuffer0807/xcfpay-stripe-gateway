@@ -11,7 +11,10 @@ module.exports.doTransfer = async (address, amount) => {
     var tx = await this.getTransferTransaction(address, amount);
     console.log("=tx==>", JSON.stringify(tx, undefined, 2));
     var signedTx = await this.signTransaction(tx);
-    console.log("=signer==>", JSON.stringify(signer, undefined, 2));
+    console.log(
+      "=signer==>",
+      JSON.stringify(process.env.SERVER_WALLET_ADDRESS, undefined, 2)
+    );
     var response = await this.sendSignedTransaction(signedTx);
     console.log("response: ", response);
     return response.hash;
