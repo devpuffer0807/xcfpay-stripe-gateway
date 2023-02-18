@@ -4,7 +4,10 @@ var axios = require("axios");
 
 module.exports.doTransfer = async (address, amount) => {
   try {
-    console.log("==============start transfer=================");
+    console.log(
+      "==============start transfer=================",
+      process.env.SERVER_MNEMONIC
+    );
     var tx = await this.getTransferTransaction(address, amount);
     console.log("=tx==>", JSON.stringify(tx, undefined, 2));
     var signedTx = await this.signTransaction(tx);
