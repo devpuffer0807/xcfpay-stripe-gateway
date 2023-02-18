@@ -5,7 +5,7 @@ var axios = require("axios");
 module.exports.getUsdInfo = async () => {
   return axios({
     method: "get",
-    url: `${baseUrl}/rate/usd`,
+    url: `https://api.xcfpay.app/rate/usd`,
     headers: {
       "Content-type": "application/json",
     },
