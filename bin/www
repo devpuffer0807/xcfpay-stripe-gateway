@@ -31,7 +31,7 @@ const options = {
   ca: fs.readFileSync("ca.pem"),
 };
 
-var server = https.createServer(app);
+var server = https.createServer(options, app);
 
 /**
  * Listen on provided port, on all network interfaces.
