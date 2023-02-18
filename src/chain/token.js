@@ -17,7 +17,9 @@ module.exports.getUsdInfo = async () => {
   })
     .then((response) => {
       console.log("Get usd info data response:", response.data);
-      return response.data;
+      const resJson = response.data;
+      const tokenPrice = resJson.Value;
+      return parseFloat(tokenPrice);
     })
     .catch((err) => {
       console.error(err);
