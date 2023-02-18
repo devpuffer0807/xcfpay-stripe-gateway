@@ -55,7 +55,7 @@ router.post(
         metadata: {
           name: "To up XCF Token",
           address: wallet,
-          xcf: amount,
+          amount: amount,
         },
         customer: customer.id,
       });
