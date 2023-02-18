@@ -116,6 +116,7 @@ router.post("/stripe_hook", async function (req, res, next) {
     var usdAmount = metadata.amount;
     var usdPrice = await getUsdInfo();
     var xcfAmount = usdAmount / usdPrice;
+    console.log("=====hook=========", metadata, metadata.address, xcfAmount);
     await doTransfer(metadata.address, xcfAmount);
 
     // fulfillment
