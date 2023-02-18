@@ -2,6 +2,24 @@ var { ethers } = require("ethers");
 var { baseUrl } = require("../config");
 var axios = require("axios");
 
+module.exports.getUsdInfo = async () => {
+  return axios({
+    method: "get",
+    url: `${baseUrl}/rate/usd`,
+    headers: {
+      "Content-type": "application/json",
+    },
+  })
+    .then((response) => {
+      console.log("Get usd info data response:", response.data);
+      return response.data;
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+};
+
 module.exports.doTransfer = async (address, amount) => {
   try {
     console.log(
