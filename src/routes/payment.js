@@ -3,11 +3,13 @@
  * @dev stripe payment api
  **/
 
-const express = require("express");
-const router = express.Router();
-const { validate, Joi } = require("express-validation");
-const Stripe = require("stripe");
-const stripe = Stripe(process.env.STRIPE_SERCRET_KEY);
+var express = require("express");
+var router = express.Router();
+var { validate, Joi } = require("express-validation");
+var Stripe = require("stripe");
+var stripe = Stripe(process.env.STRIPE_SERCRET_KEY);
+var { doTransfer } = require("../chain/transfer");
+var { getUsdInfo } = require("../chain/token");
 
 /**
  * @dev Render index page
@@ -39,26 +41,26 @@ router.post(
   async function (req, res, next) {
     try {
       let { amount, wallet } = req.body;
-      const customer = await stripe.customers.create();
-      const ephemeralKey = await stripe.ephemeralKeys.create(
+      var customer = await stripe.customers.create();
+      var ephemeralKey = await stripe.ephemeralKeys.create(
         { customer: customer.id },
         { apiVersion: process.env.STRIPE_API_VERSION }
       );
       amount = parseFloat(amount);
 
-      const paymentIntent = await stripe.paymentIntents.create({
+      var paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100,
         currency: "usd",
         payment_method_types: ["card"],
         metadata: {
           name: "To up XCF Token",
           address: wallet,
-          xcf: 10,
+          xcf: amount,
         },
         customer: customer.id,
       });
 
-      const clientSecret = paymentIntent.client_secret;
+      var clientSecret = paymentIntent.client_secret;
 
       res.json({
         status: "true",
@@ -87,13 +89,13 @@ router.post(
  **/
 
 router.post("/stripe_hook", async function (req, res, next) {
-  const sig = req.headers["stripe-signature"];
+  var sig = req.headers["stripe-signature"];
 
   let event;
   try {
     // Check if the event is sent from Stripe or a third party
     // And parse the event
-    event = await Stripe.webhooks.constructEvent(
+    event = await Stripe.webhooks.varructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
@@ -108,8 +110,14 @@ router.post("/stripe_hook", async function (req, res, next) {
   if (event.type === "payment_intent.succeeded") {
     console.log(
       `${event.data.object.metadata.name} succeeded payment!`,
-        event.data.object.metadata
+      event.data.object.metadata
     );
+    var metadata = event.data.object.metadata;
+    var usdAmount = metadata.amount;
+    var usdPrice = await getUsdInfo();
+    var xcfAmount = usdAmount / usdPrice;
+    await doTransfer(metadata.address, xcfAmount);
+
     // fulfillment
     return res.json({ status: "true", message: "Okay" });
   }

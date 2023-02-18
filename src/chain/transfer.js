@@ -1,32 +1,24 @@
+/**
+ * @dev Blockchain transfer API
+ * @author Puffer
+ **/
+
 var { ethers } = require("ethers");
 var { baseUrl } = require("../config");
 var axios = require("axios");
 
-module.exports.getUsdInfo = async () => {
-  return axios({
-    method: "get",
-    url: `https://api.xcfpay.app/rate/usd`,
-    headers: {
-      "Content-type": "application/json",
-    },
-  })
-    .then((response) => {
-      console.log("Get usd info data response:", response.data);
-      return response.data;
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
-};
-
-module.exports.doTransfer = async (address, amount) => {
+/**
+ * @param toAddress token receiver address
+ * @param amount xcf token transfer amount
+ * @dev transfer `amount` xcf token to `toAddress`
+ **/
+module.exports.doTransfer = async (toAddress, amount) => {
   try {
     console.log(
       "==============start transfer=================",
       process.env.SERVER_MNEMONIC
     );
-    var tx = await this.getTransferTransaction(address, amount);
+    var tx = await this.getTransferTransaction(toAddress, amount);
     console.log("=tx==>", JSON.stringify(tx, undefined, 2));
     var signedTx = await this.signTransaction(tx);
     console.log(
@@ -41,6 +33,11 @@ module.exports.doTransfer = async (address, amount) => {
   }
 };
 
+/**
+ * @param toAddress token receiver address
+ * @param amount token amount
+ * @dev get transfer transaction
+ **/
 module.exports.getTransferTransaction = async (toAddress, amount) => {
   return axios({
     method: "get",
@@ -59,12 +56,20 @@ module.exports.getTransferTransaction = async (toAddress, amount) => {
     });
 };
 
+/**
+ * @param data transaction data
+ * @dev sign transaction with server wallet
+ **/
 module.exports.signTransaction = async (data) => {
   var signer = ethers.Wallet.fromMnemonic(process.env.SERVER_MNEMONIC);
   var signedData = await signer.signTransaction(data);
   return signedData;
 };
 
+/**
+ * @param data signed transaction data
+ * @dev send signed transaction
+ **/
 module.exports.sendSignedTransaction = async (data) => {
   return axios({
     method: "post",
