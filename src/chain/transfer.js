@@ -16,7 +16,7 @@ module.exports.doTransfer = async (address, amount) => {
     console.log("response: ", response);
     return response.hash;
   } catch (e) {
-    console.log("==============error transfer=================");
+    console.log("==============error transfer=================", e);
   }
 };
 
